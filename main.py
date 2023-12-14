@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, jsonify
 from components import *
 from game_engine import *
 from mp_game_engine import *
-from game_engine import attack as process_attack
+from game_engine import attack 
 
 app = Flask(__name__)
 
@@ -54,7 +54,7 @@ def no_ships_remaining(ships):
     return all(value == 0 for value in ships.values())
     
 @app.route('/attack')
-def attack():
+def process_attack():
     # Get player's coordinates
     x = int(request.args.get('x'))
     y = int(request.args.get('y'))
@@ -69,7 +69,7 @@ def attack():
     global difficulty
     
     # Process player's attack
-    is_hit = process_attack((x,y), ai_board, ai_ships)
+    is_hit = attack((x,y), ai_board, ai_ships)
     
     # AI does random attacks if difficulty is set to easy
     if difficulty == 'easy':
@@ -78,7 +78,7 @@ def attack():
     elif difficulty == 'hard':
         ai_attack = generate_advanced_attack(player_board, ai_attacks_history, probable_positions)
     # Process AI's attack
-    process_attack(ai_attack, player_board, player_ships)
+    attack(ai_attack, player_board, player_ships)
     
     
     # Handle the End of the game
