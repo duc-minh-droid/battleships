@@ -63,12 +63,11 @@ def all_ships_sunk(battleships):
 
 def simple_game_loop():
     # Welcome message
-    print("Welcome to Battleship!")
+    print("Welcome to Battleship!\n")
     # Initialize player's ships and board
     ships = create_battleships()
     player_board = place_battleships(initialise_board(10) , ships, algorithm='advanced')
-    print(player_board)
-    return
+
     while True:
         # Player wins if all ships are sunk
         if all_ships_sunk(ships):
@@ -79,10 +78,16 @@ def simple_game_loop():
         # Process the attack
         is_hit = attack(coordinates, player_board, ships)
         if is_hit:
-            print("You attacked at",coordinates, ' and hit')
+            print("You attacked at",coordinates, ' and hit\n')
         else:
-            print("You attacked at",coordinates, ' and missed')
-        print("Player's board: ",player_board)
+            print("You attacked at",coordinates, ' and missed\n')
+        print("Player's board: ",player_board, '\n')
+        
+        # Log remaining ships
+        print("Remaining ships: ", '\n')
+        for ship, count in ships.items():
+            print(ship, ": ", count)
+        print("\n")
 
 if __name__ == "__main__":
     simple_game_loop()

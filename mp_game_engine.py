@@ -236,7 +236,7 @@ def all_ships_sunk(battleships):
 
 def ai_opponent_game_loop():
     # Welcome message
-    print('Welcome to Battleships!')
+    print('Welcome to Battleships!\n')
     # Initialize two players' board and ships
     global players
     player_board = place_battleships(initialise_board(10), create_battleships())
@@ -262,7 +262,7 @@ def ai_opponent_game_loop():
             break
         
         # Player's turn
-        print('Your turn: ')
+        print('Your turn: \n')
         # Get player's input
         coordinates = cli_coordinates_input()
         # Process the attack
@@ -274,7 +274,7 @@ def ai_opponent_game_loop():
         print("AI's board: ",ai_board,'\n')
             
         # AI's turn
-        print("AI turn: ")
+        print("AI turn: \n")
         # Generate the attack and process it
         ai_attack = generate_attack()
         is_hit_ai_attack = attack(ai_attack, players['player']['board'], players['player']['battleships'])
