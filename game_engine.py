@@ -66,8 +66,9 @@ def simple_game_loop():
     print("Welcome to Battleship!")
     # Initialize player's ships and board
     ships = create_battleships()
-    player_board = place_battleships(initialise_board(10) , ships, algorithm='custom')
-    
+    player_board = place_battleships(initialise_board(10) , ships, algorithm='advanced')
+    print(player_board)
+    return
     while True:
         # Player wins if all ships are sunk
         if all_ships_sunk(ships):

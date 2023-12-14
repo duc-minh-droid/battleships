@@ -23,14 +23,18 @@ def placement_interface():
     
 @app.route('/')
 def root():
+    # 2 modes: hard and easy
+    global difficulty
+    difficulty = 'hard'
+    
     # Initializing two players' board
     global player_board
     global ai_board
     player_board = place_battleships(initialise_board(), algorithm='custom')
-    ai_board = place_battleships(initialise_board(), algorithm='random')
-    # 2 modes: hard and easy
-    global difficulty
-    difficulty = 'hard'
+    if difficulty == 'easy':
+        ai_board = place_battleships(initialise_board(), algorithm='random')
+    elif difficulty == 'hard':
+        ai_board = place_battleships(initialise_board(), algorithm='advanced')
     
     # Initializing two players' ships
     global player_ships

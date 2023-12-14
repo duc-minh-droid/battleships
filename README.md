@@ -19,13 +19,18 @@ Graphical Interface with Flask:
 - Placement Page: Allows players to place their ships
 - Gameplay Page: Players can generate attacks on AI's board and check AI's attack on their own board
 - Two difficulty levels: 'hard' and 'easy'
-- Improved generate_attack function that is able to learn from previous attacks, and perform attacks with advanced algorithms
+- Easy level: Simple AI's board placement, and random attacks
+- Hard level: Advanced AI's board placement, and advanced attacks
++ Advanced placement: Strategically cluster ships to occupy certain sections of the board, mimicking human behavior. For instance, position larger ships near the center and smaller ships towards the periphery. Advanced algorithms can avoid easily identifiable patterns (e.g., perfect grid alignment), making it harder for opponents to guess ship placements based on a single hit. It also chooses ship orientations intelligently. For larger ships, consider both horizontal and vertical placements to minimize predictability.
++ Advanced attacks: Improved generate_attack function that is able to learn from previous attacks, and perform attacks with advanced algorithms: shooting in the same pattern, changing direction if previous attack missed, and handling consecutive attacks
 
 ## Requirements
 
 This project utilizes several Python libraries. To install the necessary dependencies, run:
 
-<code>pip install -r requirements.txt</code>
+```bash
+pip install -r requirements.txt
+```
 
 <i>Libraries Used:</i>
 - importlib: Used for dynamically importing modules.
@@ -42,7 +47,7 @@ This project utilizes several Python libraries. To install the necessary depende
 First, clone the repository:
 
 ```bash
-    git clone https://github.com/your-username/your-repo.git
+    git clone https://github.com/duc-minh-droid/battleships
 ```
 
 Install the required dependencies:
@@ -76,4 +81,3 @@ This project is licensed under the [MIT License].
 - **Author:** Thomas
 - **Version:** 1.0.0
 - **Release Date:** [14/12/2023]
-- **Documentation:** [Link to Documentation]
