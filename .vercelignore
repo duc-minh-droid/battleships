@@ -1,0 +1,6 @@
+docs/
+.vscode/
+__pycache__/
+test_*.py
+pytest.ini
+requirements-dev.txt
