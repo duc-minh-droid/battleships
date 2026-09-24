@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="960" height="540" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#7fb8e0"/>
+    </marker>
+    <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="2.2"/></filter>
+  </defs>
+  <rect width="960" height="540" rx="18" fill="#0b1a2d"/>
+  <text x="32" y="44" fill="#e3eefb" font-size="22" font-weight="700" letter-spacing="2">MODULE STRUCTURE</text>
+  <text x="32" y="68" fill="#86a0bd" font-size="14">Coursework modules (kept) plus the web layer added on top. Arrows = "imports / calls".</text>
+
+  <g filter="url(#rough)" stroke-width="2" fill="none">
+    <!-- browser -->
+    <rect x="32" y="100" width="260" height="170" rx="14" stroke="#4fd1ff" fill="#0f2740"/>
+    <!-- main -->
+    <rect x="360" y="100" width="260" height="170" rx="14" stroke="#3ee08f" fill="#0f2a2a"/>
+    <!-- data -->
+    <rect x="690" y="100" width="238" height="170" rx="14" stroke="#86a0bd" fill="#122034"/>
+    <!-- engines -->
+    <rect x="32" y="330" width="260" height="178" rx="14" stroke="#ffb35c" fill="#2a2116"/>
+    <rect x="360" y="330" width="260" height="178" rx="14" stroke="#ffb35c" fill="#2a2116"/>
+    <rect x="690" y="330" width="238" height="178" rx="14" stroke="#ffb35c" fill="#2a2116"/>
+  </g>
+
+  <g font-size="13" fill="#c9d8ea">
+    <text x="52" y="130" font-size="16" font-weight="700" fill="#4fd1ff">Browser</text>
+    <text x="52" y="156">templates/placement.html</text>
+    <text x="52" y="176">  + static/js/placement.js (drag, snap)</text>
+    <text x="52" y="200">templates/main.html</text>
+    <text x="52" y="220">  + static/js/game.js (turn animation)</text>
+    <text x="52" y="244">static/js/ships.js  static/css/game.css</text>
+
+    <text x="380" y="130" font-size="16" font-weight="700" fill="#3ee08f">main.py  (Flask)</text>
+    <text x="380" y="156">GET/POST /placement  placement_interface()</text>
+    <text x="380" y="178">GET /            root()  new game</text>
+    <text x="380" y="200">GET /attack?x&amp;y   process_attack()</text>
+    <text x="380" y="226" fill="#86a0bd">state: signed session cookie</text>
+    <text x="380" y="246" fill="#86a0bd">(~0.8 KB, no module globals)</text>
+
+    <text x="710" y="130" font-size="16" font-weight="700" fill="#e3eefb">Data files</text>
+    <text x="710" y="156">battleships.txt</text>
+    <text x="710" y="176" fill="#86a0bd">  ship name : length</text>
+    <text x="710" y="202">placement.json</text>
+    <text x="710" y="222" fill="#86a0bd">  default fleet layout</text>
+    <text x="710" y="242" fill="#86a0bd">  {ship: [x, y, "h"|"v"]}</text>
+
+    <text x="52" y="360" font-size="16" font-weight="700" fill="#ffb35c">components.py</text>
+    <text x="52" y="386">initialise_board(size)</text>
+    <text x="52" y="406">create_battleships(file)</text>
+    <text x="52" y="426">place_battleships(board, ships,</text>
+    <text x="52" y="444">  algorithm=simple|random|</text>
+    <text x="52" y="462">  custom|advanced)</text>
+
+    <text x="380" y="360" font-size="16" font-weight="700" fill="#ffb35c">game_engine.py</text>
+    <text x="380" y="386">attack((x, y), board, ships)</text>
+    <text x="380" y="406" fill="#86a0bd">  marks 'X' hit / 'O' miss</text>
+    <text x="380" y="426">count_ships(board)</text>
+    <text x="380" y="446">simple_game_loop()  (CLI)</text>
+    <text x="380" y="472" fill="#86a0bd">board[y][x], x = column</text>
+
+    <text x="710" y="360" font-size="16" font-weight="700" fill="#ffb35c">mp_game_engine.py</text>
+    <text x="710" y="386">generate_attack(board)</text>
+    <text x="710" y="404" fill="#86a0bd">  easy: random</text>
+    <text x="710" y="426">generate_advanced_attack()</text>
+    <text x="710" y="444" fill="#86a0bd">  hard: original pattern AI</text>
+    <text x="710" y="466">generate_hunt_target_attack()</text>
+    <text x="710" y="484" fill="#86a0bd">  expert: hunt / target</text>
+  </g>
+
+  <g stroke="#7fb8e0" stroke-width="2" fill="none" marker-end="url(#a)">
+    <path d="M292 175 C 320 175, 330 175, 356 175"/>
+    <path d="M620 185 C 648 185, 660 185, 686 185"/>
+    <path d="M430 270 C 360 300, 200 300, 162 326"/>
+    <path d="M490 270 L 490 326"/>
+    <path d="M560 270 C 640 300, 760 300, 800 326"/>
+    <path d="M690 420 C 660 420, 650 420, 624 420"/>
+  </g>
+  <g font-size="12" fill="#7fb8e0">
+    <text x="296" y="165">fetch JSON</text>
+  </g>
+</svg>

@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="960" height="560" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#7fb8e0"/>
+    </marker>
+    <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="2.2"/></filter>
+  </defs>
+  <rect width="960" height="560" rx="18" fill="#0b1a2d"/>
+  <text x="32" y="44" fill="#e3eefb" font-size="22" font-weight="700" letter-spacing="2">ONE TURN = ONE REQUEST</text>
+  <text x="32" y="68" fill="#86a0bd" font-size="14">The server resolves both shots at once; the browser then plays them back as two animated half-turns.</text>
+
+  <!-- lanes -->
+  <g filter="url(#rough)" fill="none" stroke-width="2">
+    <rect x="32" y="92" width="896" height="200" rx="14" stroke="#3ee08f" fill="#0f2a2a"/>
+    <rect x="32" y="316" width="896" height="220" rx="14" stroke="#4fd1ff" fill="#0f2740"/>
+  </g>
+  <text x="52" y="120" fill="#3ee08f" font-size="15" font-weight="700">SERVER  GET /attack?x=&amp;y=</text>
+  <text x="52" y="344" fill="#4fd1ff" font-size="15" font-weight="700">BROWSER  game.js</text>
+
+  <g font-size="13" fill="#e3eefb">
+    <!-- server steps -->
+    <g filter="url(#rough)" stroke="#5fae8a" stroke-width="1.6" fill="#123833">
+      <rect x="52" y="138" width="150" height="120" rx="10"/>
+      <rect x="226" y="138" width="150" height="120" rx="10"/>
+      <rect x="400" y="138" width="170" height="120" rx="10"/>
+      <rect x="594" y="138" width="150" height="120" rx="10"/>
+      <rect x="768" y="138" width="144" height="120" rx="10"/>
+    </g>
+    <text x="64" y="162" font-weight="700">1. Load</text>
+    <text x="64" y="184" fill="#b5c9dc">decode boards</text>
+    <text x="64" y="202" fill="#b5c9dc">+ AI history from</text>
+    <text x="64" y="220" fill="#b5c9dc">session cookie</text>
+
+    <text x="238" y="162" font-weight="700">2. Player shot</text>
+    <text x="238" y="184" fill="#b5c9dc">reject repeats,</text>
+    <text x="238" y="202" fill="#b5c9dc">attack() on AI board,</text>
+    <text x="238" y="220" fill="#b5c9dc">sunk? send its cells</text>
+
+    <text x="412" y="162" font-weight="700">3. AI shot</text>
+    <text x="412" y="184" fill="#b5c9dc">skipped if you won</text>
+    <text x="412" y="202" fill="#b5c9dc">easy / hard / expert</text>
+    <text x="412" y="220" fill="#b5c9dc">picks (x, y), then</text>
+    <text x="412" y="238" fill="#b5c9dc">attack() on your board</text>
+
+    <text x="606" y="162" font-weight="700">4. Save</text>
+    <text x="606" y="184" fill="#b5c9dc">re-encode boards</text>
+    <text x="606" y="202" fill="#b5c9dc">into the signed</text>
+    <text x="606" y="220" fill="#b5c9dc">cookie (~0.8 KB)</text>
+
+    <text x="780" y="162" font-weight="700">5. Reply</text>
+    <text x="780" y="184" fill="#b5c9dc" font-family="Consolas, monospace" font-size="12">hit, sunk,</text>
+    <text x="780" y="202" fill="#b5c9dc" font-family="Consolas, monospace" font-size="12">AI_Turn, ai_hit,</text>
+    <text x="780" y="220" fill="#b5c9dc" font-family="Consolas, monospace" font-size="12">ai_sunk,</text>
+    <text x="780" y="238" fill="#b5c9dc" font-family="Consolas, monospace" font-size="12">finished</text>
+
+    <!-- browser steps -->
+    <g filter="url(#rough)" stroke="#4f8fb8" stroke-width="1.6" fill="#15324f">
+      <rect x="52" y="364" width="150" height="150" rx="10"/>
+      <rect x="226" y="364" width="170" height="150" rx="10"/>
+      <rect x="420" y="364" width="150" height="150" rx="10"/>
+      <rect x="594" y="364" width="170" height="150" rx="10"/>
+      <rect x="788" y="364" width="124" height="150" rx="10"/>
+    </g>
+    <text x="64" y="388" font-weight="700">Click a cell</text>
+    <text x="64" y="410" fill="#b5c9dc">board locks,</text>
+    <text x="64" y="428" fill="#b5c9dc">fetch starts</text>
+    <circle cx="127" cy="470" r="18" fill="none" stroke="#4fd1ff" stroke-width="2"/>
+    <path d="M127 456v28M113 470h28" stroke="#4fd1ff" stroke-width="2"/>
+
+    <text x="238" y="388" font-weight="700">Your shell lands</text>
+    <text x="238" y="410" fill="#b5c9dc">miss: rings + spray</text>
+    <text x="238" y="428" fill="#b5c9dc">hit: flash, sparks,</text>
+    <text x="238" y="446" fill="#b5c9dc">smoke, board shake</text>
+    <circle cx="280" cy="484" r="10" fill="none" stroke="#dff3ff" stroke-width="2"/>
+    <circle cx="280" cy="484" r="18" fill="none" stroke="#dff3ff" stroke-opacity=".5" stroke-width="1.5"/>
+    <circle cx="340" cy="484" r="14" fill="#ff8a2b" opacity=".8"/>
+    <circle cx="340" cy="484" r="6" fill="#ffe08a"/>
+
+    <text x="432" y="388" font-weight="700">Sunk?</text>
+    <text x="432" y="410" fill="#b5c9dc">reveal the hull,</text>
+    <text x="432" y="428" fill="#b5c9dc">tilt + sink, bubbles,</text>
+    <text x="432" y="446" fill="#b5c9dc">toast, strike name</text>
+    <path d="M452 486 l70 -6 l10 8 l-72 6z" fill="#5b2d31" transform="rotate(7 490 486)"/>
+
+    <text x="606" y="388" font-weight="700">Enemy turn</text>
+    <text x="606" y="410" fill="#b5c9dc">turn pill goes red,</text>
+    <text x="606" y="428" fill="#b5c9dc">radar sweeps your</text>
+    <text x="606" y="446" fill="#b5c9dc">grid, reticle hops,</text>
+    <text x="606" y="464" fill="#b5c9dc">AI shell lands</text>
+
+    <text x="800" y="388" font-weight="700">Your turn</text>
+    <text x="800" y="410" fill="#b5c9dc">or the end</text>
+    <text x="800" y="428" fill="#b5c9dc">screen with</text>
+    <text x="800" y="446" fill="#b5c9dc">stats + reveal</text>
+  </g>
+
+  <g stroke="#7fb8e0" stroke-width="2" fill="none" marker-end="url(#a)">
+    <path d="M202 198 H 222"/>
+    <path d="M376 198 H 396"/>
+    <path d="M570 198 H 590"/>
+    <path d="M744 198 H 764"/>
+    <path d="M190 364 L 190 262"/>
+    <path d="M840 258 C 820 330, 360 300, 320 360"/>
+    <path d="M202 440 H 222"/>
+    <path d="M396 440 H 416"/>
+    <path d="M570 440 H 590"/>
+    <path d="M764 440 H 784"/>
+  </g>
+  <path d="M850 514 C 850 548, 127 548, 127 518" stroke="#7fb8e0" stroke-width="1.5" stroke-dasharray="6 6" fill="none" marker-end="url(#a)"/>
+  <text x="440" y="552" fill="#7fb8e0" font-size="12">next click</text>
+  <text x="600" y="308" fill="#7fb8e0" font-size="12">JSON reply drives the animation</text>
+</svg>
