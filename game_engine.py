@@ -20,7 +20,7 @@ def count_ships(board):
     return ship_count
 
 def attack(coordinates, board, battleships):
-    # Extract the x and y coordinates
+    # Extract the x (column) and y (row) coordinates
     x, y = coordinates
     
     # Loop through each row of the board
@@ -28,10 +28,10 @@ def attack(coordinates, board, battleships):
         # Loop through each cell in the row
         for j in range(len(board[i])):
             # Check if the current cell matches the attack coordinates
-            if i == x and j == y:
+            if i == y and j == x:
                 # If the cell is empty, mark it as a miss ('O')
                 if board[i][j] is None:
-                    board[x][y] = 'O'
+                    board[y][x] = 'O'
                     return False  # Indicate a miss
                 # If the cell is already marked as hit ('X') or miss ('O'), return False
                 elif board[i][j] == 'O' or board[i][j] == 'X':
@@ -41,7 +41,7 @@ def attack(coordinates, board, battleships):
                     ship = board[i][j]
                     battleships[ship] -= 1
                     # Mark the cell as hit ('X')
-                    board[x][y] = 'X'
+                    board[y][x] = 'X'
                     return True  # Indicate a successful hit
 
 def cli_coordinates_input():

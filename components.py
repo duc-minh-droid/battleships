@@ -1,11 +1,21 @@
+import os
 import random
 import json
+
+# Data files live next to this module, so the game works no matter which
+# directory it is launched from (e.g. a Vercel function).
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+def _data_path(filename):
+    if os.path.isabs(filename) or os.path.exists(filename):
+        return filename
+    return os.path.join(BASE_DIR, filename)
 
 def initialise_board(size=10):
     return [[None for _ in range(size)] for _ in range(size)]
 
 def get_ship_size(ship_name):
-    with open('battleships.txt', 'r') as file:
+    with open(_data_path('battleships.txt'), 'r') as file:
         for line in file:
             name, size = line.strip().split(':')
             if name == ship_name:
@@ -14,14 +24,14 @@ def get_ship_size(ship_name):
 
 def create_battleships(filename='battleships.txt'):
     battleships = {}
-    with open(filename, 'r') as f:
+    with open(_data_path(filename), 'r') as f:
         lines = [line.strip() for line in f.readlines()]
         for line in lines:
             name, size = line.split(':')
             battleships[name] = int(size)
     return battleships
         
-def place_battleships(board, ships=None,algorithm='simple'):
+def place_battleships(board, ships=None,algorithm='simple', placement=None):
     def place_large_ships(board, ships):
         large_ships = [{'name':ship,'size':ships[ship]} for ship in ships if ships[ship] > 3]  # Assuming ships larger than 2 as 'large'
         for large_ship in large_ships:
@@ -40,7 +50,7 @@ def place_battleships(board, ships=None,algorithm='simple'):
         board_size = len(board)
         orientation = random.choice(['horizontal', 'vertical'])
         attempts = 0
-        while attempts < 100:  # Limiting attempts to avoid infinite loops
+        while True:
             x = random.randint(0, board_size - 1)
             y = random.randint(0, board_size - 1)
             if check_valid_placement(board, x, y, size, orientation):
@@ -51,6 +61,10 @@ def place_battleships(board, ships=None,algorithm='simple'):
                         board[x+i][y] = name
                 break
             attempts += 1
+            # After 100 failed attempts try the other orientation instead of
+            # silently leaving the ship off the board
+            if attempts % 100 == 0:
+                orientation = 'vertical' if orientation == 'horizontal' else 'horizontal'
 
     player_board = board
     board_size = len(board)
@@ -96,34 +110,36 @@ def place_battleships(board, ships=None,algorithm='simple'):
                             player_board[start_y][start_x+k] = ship
                         break
     if algorithm == 'custom':
-        with open('placement.json') as f:
-                placement_data = json.load(f)
-                for ship in placement_data:
-                    info = placement_data[ship]
-                    x = int(info[0])
-                    y = int(info[1])
-                    orientation = info[2]
-                    size = get_ship_size(ship)
+        if placement is None:
+            with open(_data_path('placement.json')) as f:
+                placement = json.load(f)
+        placement_data = placement
+        for ship in placement_data:
+            info = placement_data[ship]
+            x = int(info[0])
+            y = int(info[1])
+            orientation = info[2]
+            size = get_ship_size(ship)
 
-                    if orientation == 'h':
-                        if x + size <= len(player_board[0]):  # Check if ship fits horizontally
-                            if all(player_board[y][x + k] is None for k in range(size)):
-                                for k in range(size):
-                                    player_board[y][x + k] = ship
-                            else:
-                                print(f"Can't place {ship} horizontally at {x}, {y}.")
-                        else:
-                            print(f"Can't place {ship} horizontally at {x}, {y}. Out of board bounds.")
+            if orientation == 'h':
+                if x + size <= len(player_board[0]):  # Check if ship fits horizontally
+                    if all(player_board[y][x + k] is None for k in range(size)):
+                        for k in range(size):
+                            player_board[y][x + k] = ship
+                    else:
+                        print(f"Can't place {ship} horizontally at {x}, {y}.")
+                else:
+                    print(f"Can't place {ship} horizontally at {x}, {y}. Out of board bounds.")
                             
-                    elif orientation == 'v':
-                        if y + size <= len(player_board):  # Check if ship fits vertically
-                            if all(player_board[y + k][x] is None for k in range(size)):
-                                for k in range(size):
-                                    player_board[y + k][x] = ship
-                            else:
-                                print(f"Can't place {ship} vertically at {x}, {y}.")
-                        else:
-                            print(f"Can't place {ship} vertically at {x}, {y}. Out of board bounds.")
+            elif orientation == 'v':
+                if y + size <= len(player_board):  # Check if ship fits vertically
+                    if all(player_board[y + k][x] is None for k in range(size)):
+                        for k in range(size):
+                            player_board[y + k][x] = ship
+                    else:
+                        print(f"Can't place {ship} vertically at {x}, {y}.")
+                else:
+                    print(f"Can't place {ship} vertically at {x}, {y}. Out of board bounds.")
     if algorithm == 'advanced':
         place_large_ships(board, ships)
         place_small_ships(board, ships)

@@ -3,36 +3,42 @@ from components import *
 from game_engine import *
 
 # Generate attack with advanced algorithms for difficulty: Hard
-def generate_advanced_attack(board, history, probable_positions):
+def generate_advanced_attack(board, history, probable_positions, verbose=False):
+    board_size = len(board)
+    # Coordinates are (x, y) = (column, row), matching attack() in game_engine
+    def in_bounds(coords):
+        return coords is not None and 0 <= coords[0] < board_size and 0 <= coords[1] < board_size
+    def already_attacked(coords):
+        return coords in [attack['coords'] for attack in history]
     # Update history after modifying
     def update_history(coords, direction=None):
-        if not coords:
-            rd_coords = process_random_attack()
-            is_hit = False
-            if board[rd_coords[1]][rd_coords[0]] not in [None, 'O', 'X']:
-                is_hit = True
-            history.append({'coords': rd_coords, 'is_hit': is_hit, 'direction': None})
         is_hit = False
         if board[coords[1]][coords[0]] not in [None, 'O', 'X']:
             is_hit = True
         history.append({'coords': coords, 'is_hit': is_hit, 'direction': direction})
     # Generate random coordinates
     def random_attack():
-        while True:
-            attack_coords = random.choice(probable_positions)
-            if attack_coords not in [attack['coords'] for attack in history]:
-                probable_positions.remove(attack_coords)
-                return attack_coords
+        # Drop cells that were already hit by a directional shot, otherwise
+        # this loop could spin forever near the end of a game
+        attacked = [attack['coords'] for attack in history]
+        probable_positions[:] = [pos for pos in probable_positions if pos not in attacked]
+        attack_coords = random.choice(probable_positions)
+        probable_positions.remove(attack_coords)
+        return attack_coords
     # Get coordinates based on direction
     def get_next_coords(prev_hit_coords, direction):
         if direction == 'up':
-            return prev_hit_coords[0], prev_hit_coords[1] - 1
+            coords = prev_hit_coords[0], prev_hit_coords[1] - 1
         elif direction == 'down':
-            return prev_hit_coords[0], prev_hit_coords[1] + 1
+            coords = prev_hit_coords[0], prev_hit_coords[1] + 1
         elif direction == 'left':
-            return prev_hit_coords[0] - 1, prev_hit_coords[1]
+            coords = prev_hit_coords[0] - 1, prev_hit_coords[1]
         elif direction == 'right':
-            return prev_hit_coords[0] + 1, prev_hit_coords[1]
+            coords = prev_hit_coords[0] + 1, prev_hit_coords[1]
+        else:
+            return None
+        # Never aim off the edge of the board
+        return coords if in_bounds(coords) else None
     # Check the next potential attack coordinates based on the direction of the last hit if those coordinates haven't been previously targeted
     def check_previous_hits():
     # Check if the last attack was a hit
@@ -49,6 +55,8 @@ def generate_advanced_attack(board, history, probable_positions):
                 return next_coords  # Return the coordinates for the next potential attack
     # Logging function for debugging
     def log(coords, message):
+        if not verbose:
+            return
         new_history = history.copy()
         print("\nAI TURN: ")
         print(f"AI's previous attacks ({len(new_history)}): ", new_history)
@@ -89,6 +97,8 @@ def generate_advanced_attack(board, history, probable_positions):
         return attack_coords
     # Process the attack for attacks in opposite direction if there are multiple consecutive attacks
     def check_and_return(coords):
+        if not in_bounds(coords):
+            return process_random_attack()
         for attack in history:
             if attack['coords'] == coords:
                 log(coords, "Random attack")
@@ -188,7 +198,7 @@ def generate_advanced_attack(board, history, probable_positions):
             if not recent_attacks:
                 return process_random_attack()
             next_coords = get_next_coords(recent_attacks[-1]['coords'], direction)
-            if next_coords in [attack['coords'] for attack in history]:
+            if next_coords is None or already_attacked(next_coords):
                 return process_random_attack()
             update_history(next_coords, direction)
             log(next_coords, "Last direction was wrong so picking another one, shooting")
@@ -196,6 +206,8 @@ def generate_advanced_attack(board, history, probable_positions):
         # Continues shooting at same pattern
         elif history[-1]['is_hit'] and history[-1]['direction']!=None:
             next_coords = check_previous_hits()
+            if next_coords is None:
+                return process_random_attack()
             update_history(next_coords,history[-1]['direction'])
             log(next_coords, "Noticed a pattern, continues to shoot")
             return next_coords
@@ -204,7 +216,7 @@ def generate_advanced_attack(board, history, probable_positions):
             directions = ['up', 'down', 'left', 'right']
             direction = random.choice(directions)
             next_coords = get_next_coords(history[-1]['coords'], direction)
-            if next_coords in [attack['coords'] for attack in history]:
+            if next_coords is None or already_attacked(next_coords):
                 return process_random_attack()
             update_history(next_coords, direction)
             log(next_coords, "Chose a random direction, shooting")
@@ -213,9 +225,8 @@ def generate_advanced_attack(board, history, probable_positions):
         else:
             return process_random_attack()
           
-def generate_attack():
-    board_size = 10
-    prev_attacks = []
+def generate_attack(board=None):
+    board_size = len(board) if board else 10
 
     x_max = board_size - 1
     y_max = board_size - 1
@@ -225,10 +236,70 @@ def generate_attack():
         x = random.randint(0, x_max)
         y = random.randint(0, y_max)
         
-        # Ensure the generated coordinates hasn't existed
-        if (x, y) not in prev_attacks:
-            prev_attacks.append((x, y))
+        # When the board is known, never waste a shot on a cell that was
+        # already attacked ('X' = hit, 'O' = miss)
+        if board is None or board[y][x] not in ['X', 'O']:
             return (x, y)
+
+# Generate attack with hunt/target mode for difficulty: Expert
+def generate_hunt_target_attack(board, remaining_sizes, sunk_cells=()):
+    """
+    Hunt/target AI. It only looks at the shot marks on the board ('X' hit,
+    'O' miss), never at where the ships are, so it plays fair.
+
+    - Target mode: if there are hits that do not belong to a sunk ship, shoot
+      next to them, preferring to extend a line of two or more hits.
+    - Hunt mode: otherwise count, for every unshot cell, how many ways the
+      remaining ships could still fit over it and shoot the most likely cell.
+    """
+    size = len(board)
+    sunk = {tuple(c) for c in sunk_cells}
+
+    def shot(x, y):
+        return board[y][x] in ['X', 'O']
+
+    def open_hit(x, y):
+        return 0 <= x < size and 0 <= y < size and board[y][x] == 'X' and (x, y) not in sunk
+
+    def free(x, y):
+        return 0 <= x < size and 0 <= y < size and not shot(x, y)
+
+    hits = [(x, y) for y in range(size) for x in range(size) if open_hit(x, y)]
+
+    # Target mode
+    if hits:
+        scores = {}
+        for (x, y) in hits:
+            for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+                # Walk along a line of hits and score the first free cell after it
+                if open_hit(x - dx, y - dy):
+                    nx, ny = x + dx, y + dy
+                    while open_hit(nx, ny):
+                        nx, ny = nx + dx, ny + dy
+                    if free(nx, ny):
+                        scores[(nx, ny)] = max(scores.get((nx, ny), 0), 10)
+                elif free(x + dx, y + dy):
+                    scores[(x + dx, y + dy)] = max(scores.get((x + dx, y + dy), 0), 1)
+        if scores:
+            best = max(scores.values())
+            return random.choice([c for c, v in scores.items() if v == best])
+
+    # Hunt mode: placement density of the ships that are still afloat
+    density = [[0] * size for _ in range(size)]
+    for length in remaining_sizes:
+        for y in range(size):
+            for x in range(size):
+                for dx, dy in [(1, 0), (0, 1)]:
+                    cells = [(x + dx * k, y + dy * k) for k in range(length)]
+                    if all(free(cx, cy) or open_hit(cx, cy) for cx, cy in cells):
+                        for cx, cy in cells:
+                            if free(cx, cy):
+                                density[cy][cx] += 1
+    best = max(max(row) for row in density)
+    if best == 0:
+        return generate_attack(board)
+    choices = [(x, y) for y in range(size) for x in range(size) if density[y][x] == best]
+    return random.choice(choices)
 
 def all_ships_sunk(battleships):
     # Check if all ship counts are zero
@@ -276,7 +347,7 @@ def ai_opponent_game_loop():
         # AI's turn
         print("AI turn: \n")
         # Generate the attack and process it
-        ai_attack = generate_attack()
+        ai_attack = generate_attack(players['player']['board'])
         is_hit_ai_attack = attack(ai_attack, players['player']['board'], players['player']['battleships'])
         if is_hit_ai_attack:
             print("AI attacked at", ai_attack, " and hit!\n")
