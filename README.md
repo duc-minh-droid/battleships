@@ -1,5 +1,7 @@
 # Battleships
 
+**Play it live:** https://battleships-gold.vercel.app
+
 Battleships against an AI opponent, written in Python with a Flask web front end. You drag your fleet onto the grid, pick an opponent, and trade shots until one fleet is gone.
 
 ![Placing ships and playing a few turns against the expert AI](docs/media/demo.gif)
@@ -74,7 +76,7 @@ python mp_game_engine.py   # against the random AI
 
 ### Deploying to Vercel
 
-`api/index.py` exposes the Flask app as a Vercel Python function, and `vercel.json` routes every path to it (static files are served by Flask). Because the game state is in the cookie, nothing depends on process memory.
+Vercel detects the Flask `app` in `main.py` with no config file. Set `SECRET_KEY` in the project's environment variables. Because the game state is in the cookie, nothing depends on process memory.
 
 - Root directory: repository root
 - Framework preset: Other
@@ -96,7 +98,6 @@ static/css/game.css  theme, board, ship and effect animations
 static/js/ships.js   board builder, SVG ship drawings, splash/explosion/bubble effects
 static/js/placement.js  drag, snap, rotate, randomise
 static/js/game.js    turn playback, fleet status, log, end screen
-api/index.py         Vercel entry point
 test_students.py     test suite provided with the coursework
 test_web.py          HTTP game flow, placement validation and AI tests
 docs/media/          demo, screenshots, diagrams, original 2023 screenshots

@@ -1,8 +1,0 @@
-{
-  "functions": {
-    "api/index.py": {
-      "includeFiles": "{templates/**,static/**,battleships.txt,placement.json,components.py,game_engine.py,mp_game_engine.py,main.py}"
-    }
-  },
-  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
-}
